@@ -301,6 +301,12 @@ nav h1 a {
   }
 }
 
+@media screen and (max-width:658px) {
+  #restaurants-list {
+    justify-content: center;
+  }
+}
+
 @media screen and (max-width:790px) {
 
   nav h1 a {

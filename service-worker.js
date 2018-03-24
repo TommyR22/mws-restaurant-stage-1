@@ -7,7 +7,9 @@
         return cache.addAll(['/',
           '/js/main.js',
           '/css/styles.css',
-          '/img'
+          '/img',
+          '/js/dbhelper.js',
+          '/js/restaurant_info.js'
         ]);
       }));
     });
