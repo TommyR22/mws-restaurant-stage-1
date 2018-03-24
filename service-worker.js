@@ -7,9 +7,19 @@
         return cache.addAll(['/',
           '/js/main.js',
           '/css/styles.css',
-          '/img',
+          '/img/1.jpg',
+          '/img/2.jpg',
+          '/img/3.jpg',
+          '/img/4.jpg',
+          '/img/5.jpg',
+          '/img/6.jpg',
+          '/img/7.jpg',
+          '/img/8.jpg',
+          '/img/9.jpg',
+          '/img/10.jpg',
           '/js/dbhelper.js',
-          '/js/restaurant_info.js'
+          '/js/restaurant_info.js',
+          '/data/restaurants.json'
         ]);
       }));
     });
@@ -32,36 +42,11 @@
           event.respondWith(caches.match('/'));
           return;
         }
-        if (requestUrl.pathname.startsWith('/photos/')) {
-          //event.respondWith(servePhoto(event.request));
-          return;
-        }
       }
     
       event.respondWith(caches.match(event.request).then(function (response) {
         return response || fetch(event.request);
       }));
     });
-    
-    // function servePhoto(request) {
-    //   var storageUrl = request.url.replace(/-\d+px\.jpg$/, '');
-    
-    //   return caches.open(contentImgsCache).then(function (cache) {
-    //     return cache.match(storageUrl).then(function (response) {
-    //       if (response) return response;
-    
-    //       return fetch(request).then(function (networkResponse) {
-    //         cache.put(storageUrl, networkResponse.clone());
-    //         return networkResponse;
-    //       });
-    //     });
-    //   });
-    // }
-    
-    // self.addEventListener('message', function (event) {
-    //   if (event.data.action === 'skipWaiting') {
-    //     self.skipWaiting();
-    //   }
-    // });
     
       
