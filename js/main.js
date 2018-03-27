@@ -8,16 +8,24 @@ var markers = []
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', (event) => {
-
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./service-worker.js').then(function () {
-      console.log('Service Worker Registered');
-    });
-  }
-
+    registerServiceWorker();
   fetchNeighborhoods();
   fetchCuisines();
 });
+
+registerServiceWorker = () => {
+
+    if (!navigator.serviceWorker) return;
+    if ('serviceWorker' in navigator) {
+
+        navigator.serviceWorker.register('/service-worker.js').then( (registration) =>{
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+    }).catch( (err) => {
+            // registration failed :(
+            console.log('ServiceWorker registration failed: ', err);
+    });
+    }
+}
 
 /**
  * Fetch all neighborhoods and set their HTML.
@@ -31,6 +39,7 @@ fetchNeighborhoods = () => {
       fillNeighborhoodsHTML();
     }
   });
+
 }
 
 /**

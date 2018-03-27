@@ -18,8 +18,7 @@
           '/img/9.jpg',
           '/img/10.jpg',
           '/js/dbhelper.js',
-          '/js/restaurant_info.js',
-          '/data/restaurants.json'
+          '/js/restaurant_info.js'
         ]);
       }));
     });
