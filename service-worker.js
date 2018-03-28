@@ -1,51 +1,112 @@
-    var staticCacheName = 'restaurant-static-v1';
-    var contentImgsCache = 'restaurant-content-imgs';
-    var allCaches = [staticCacheName, contentImgsCache];
-    
-    self.addEventListener('install', function (event) {
-      event.waitUntil(caches.open(staticCacheName).then(function (cache) {
-        return cache.addAll(['/',
-          '/js/main.js',
-          '/css/styles.css',
-          '/img/1.jpg',
-          '/img/2.jpg',
-          '/img/3.jpg',
-          '/img/4.jpg',
-          '/img/5.jpg',
-          '/img/6.jpg',
-          '/img/7.jpg',
-          '/img/8.jpg',
-          '/img/9.jpg',
-          '/img/10.jpg',
-          '/js/dbhelper.js',
-          '/js/restaurant_info.js'
-        ]);
-      }));
-    });
-    
+const CACHE = 'restaurant-cache-v1';
+
+// A list of local resources we always want to be cached.
+const CACHE_URLS = [
+    'index.html',
+    './', // Alias for index.html
+    'restaurant.html',
+    'js/main.js',
+    'js/dbhelper.js',
+    'js/restaurant_info.js',
+    'data/restaurants.json',
+    'css/styles.css',
+    'img/1.webp',
+    'img/2.webp',
+    'img/3.webp',
+    'img/4.webp',
+    'img/5.webp',
+    'img/6.webp',
+    'img/7.webp',
+    'img/8.webp',
+    'img/9.webp',
+    'img/10.webp'
+];
+
+
+// The install handler takes care of precaching the resources we always need.
+self.addEventListener('install', event => {
+    event.waitUntil(
+    caches.open(CACHE)
+        .then(cache => cache.addAll(CACHE_URLS))
+    .then(self.skipWaiting())
+);
+});
+
+// The activate handler takes care of cleaning up old caches.
+self.addEventListener('activate', event => {
     self.addEventListener('activate', function (event) {
-      event.waitUntil(caches.keys().then(function (cacheNames) {
-        return Promise.all(cacheNames.filter(function (cacheName) {
-          return cacheName.startsWith('restaurant-') && !allCaches.includes(cacheName);
-        }).map(function (cacheName) {
-          return caches['delete'](cacheName);
-        }));
-      }));
+
+    var cacheWhitelist = ['restaurant-cache-v1'];
+
+    event.waitUntil(
+        caches.keys().then(function (cacheNames) {
+            return Promise.all(
+                cacheNames.map(function (cacheName) {
+                    if (cacheWhitelist.indexOf(cacheName) === -1) {
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
+        })
+    );
     });
-    
-    self.addEventListener('fetch', function (event) {
-      var requestUrl = new URL(event.request.url);
-    
-      if (requestUrl.origin === location.origin) {
-        if (requestUrl.pathname === '/') {
-          event.respondWith(caches.match('/'));
-          return;
-        }
-      }
-    
-      event.respondWith(caches.match(event.request).then(function (response) {
-        return response || fetch(event.request);
-      }));
-    });
-    
-      
+});
+
+
+// The fetch handler serves responses for same-origin resources from a cache.
+// If no response is found, it populates the runtime cache with the response
+// from the network before returning it to the page.
+self.addEventListener('fetch', function(event) {
+    event.respondWith(
+        caches.match(event.request)
+            .then(function(response) {
+                    // Cache hit - return response
+                    if (response) {
+                        return response;
+                    }
+                    return fetch(event.request);
+                }
+            )
+    );
+});
+
+
+// self.addEventListener('install', event => {
+//     event.waitUntil(
+//     caches.open('restaurant-review-v2').then( cache => {
+//         return cache.addAll([
+//             '/',
+//             'index.html',
+//             'restaurant.html',
+//             'js/main.js',
+//             'js/dbhelper.js',
+//             'js/restaurant_info.js',
+//             'data/restaurants.json',
+//             'css/styles.css',
+//             'img/1.webp',
+//             'img/2.webp',
+//             'img/3.webp',
+//             'img/4.webp',
+//             'img/5.webp',
+//             'img/6.webp',
+//             'img/7.webp',
+//             'img/8.webp',
+//             'img/9.webp',
+//             'img/10.webp'
+//         ])
+//     })
+// )
+// });
+//
+// self.addEventListener('fetch', event => {
+//     event.respondWith(
+//     caches.match(event.request).then( response =>{
+//         // Cache hit - return response
+//         if (response) {
+//             return response;
+//         }
+//
+//         return fetch(event.request)
+//     })
+// )
+// });
