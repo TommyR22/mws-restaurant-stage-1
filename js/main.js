@@ -9,22 +9,23 @@ var markers = []
  */
 document.addEventListener('DOMContentLoaded', (event) => {
 
-  //registerServiceWorker();
+  registerServiceWorker();
   fetchNeighborhoods();
   fetchCuisines();
 });
 
 
 registerServiceWorker = () => {
-
-    if (!navigator.serviceWorker) return;
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/service-worker.js').then( (registration) =>{
-            console.log('ServiceWorker registration successful with scope: ', registration.scope);
-    }).catch( (err) => {
-            // registration failed :(
-            console.log('ServiceWorker registration failed: ', err);
-    });
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+                // Registration was successful
+                console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            }, function(err) {
+                // registration failed :(
+                console.log('ServiceWorker registration failed: ', err);
+            });
+        });
     }
 }
 
