@@ -9,15 +9,25 @@ var markers = []
  */
 document.addEventListener('DOMContentLoaded', (event) => {
 
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./service-worker.js').then(function () {
-      console.log('Service Worker Registered');
-    });
-  }
-
+  registerServiceWorker();
   fetchNeighborhoods();
   fetchCuisines();
 });
+
+
+registerServiceWorker = () => {
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+                // Registration was successful
+                console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            }, function(err) {
+                // registration failed :(
+                console.log('ServiceWorker registration failed: ', err);
+            });
+        });
+    }
+}
 
 /**
  * Fetch all neighborhoods and set their HTML.
@@ -31,6 +41,7 @@ fetchNeighborhoods = () => {
       fillNeighborhoodsHTML();
     }
   });
+
 }
 
 /**
@@ -145,10 +156,38 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
 createRestaurantHTML = (restaurant) => {
   const li = document.createElement('li');
 
+  // LAZY LOADING IMAGES
   const image = document.createElement('img');
-  image.className = 'restaurant-img';
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
-  image.alt = 'image of '+ restaurant.name + ' restaurant';
+  const config = {
+      threshold: 0.1
+  };
+
+  let observer;
+  if ('IntersectionObserver' in window) {
+      observer = new IntersectionObserver(onChange, config);
+      observer.observe(image);
+  } else {
+      console.log('Intersection Observers not supported', 'color: red');
+      loadImage(image);
+  }
+  const loadImage = image => {
+      image.className = 'restaurant-img';
+      image.src = DBHelper.imageUrlForRestaurant(restaurant);
+      image.alt = 'image of '+ restaurant.name + ' restaurant';
+  }
+  function onChange(changes, observer) {
+      changes.forEach(change => {
+          if (change.intersectionRatio > 0) {
+            //console.log('image in View');
+            // Stop watching and load the image
+            loadImage(change.target);
+            observer.unobserve(change.target);
+      }else {
+          //console.log('image out View');
+      }
+  });
+  }
+
   li.append(image);
 
   const name = document.createElement('h2');
