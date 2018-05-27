@@ -18,11 +18,11 @@ ul, li {
 	color: #333;
 }
 a {
-	color: orange;
+	color: #FFDDAD;
 	text-decoration: none;
 }
 a:hover, a:focus {
-	color: #3397db;
+	color: #12496E;
 	text-decoration: none;
 }
 a img{
@@ -41,7 +41,7 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
 }
 #footer {
   background-color: #444;
-  color: #aaa;
+  color: #fff;
   font-size: 8pt;
   letter-spacing: 1px;
   padding: 25px;
@@ -108,7 +108,7 @@ nav h1 a {
 .filter-options {
   width: 100%;
   height: 100%;
-  background-color: #3397DB;
+  background-color: #12496E;
   align-items: center;
   display: flex;
   flex-flow: row wrap;
@@ -181,7 +181,7 @@ nav h1 a {
   font-size: 11pt;
 }
 #restaurants-list li a {
-  background-color: orange;
+  background-color: #AD6500;
   border-bottom: 3px solid #eee;
   color: #fff;
   display: inline-block;
