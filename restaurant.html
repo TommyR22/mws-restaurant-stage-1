@@ -42,11 +42,47 @@
       <table id="restaurant-hours"></table>
     </section>
     <!-- end restaurant -->
+
+    <!-- Add Reviews Modal -->
+    <section id="form-container">
+      <h2 id="form-name">Add Review</h2>
+      <form id="review-form">
+        <label for="review-author">Author:</label></br>
+        <input id="review-author" name="name" type="text" />
+
+        <div class="rating-container">
+          <p>Rating:</p>
+          <div class="rating">
+            <input name="rating" id="review-rating5" type="radio" value="5"/>
+            <label for="review-rating5" title="5 stars">5</label>
+
+            <input name="rating" id="review-rating4" type="radio" value="4"/>
+            <label for="review-rating4" title="4 stars">4</label>
+
+            <input name="rating" id="review-rating3" type="radio" value="3"/>
+            <label for="review-rating3" title="3 stars">3</label>
+
+            <input name="rating" id="review-rating2" type="radio" value="2"/>
+            <label for="review-rating2" title="2 stars">2</label>
+
+            <input name="rating" id="review-rating1" type="radio" value="1"/>
+            <label for="review-rating1" title="1 stars">1</label>
+          </div>
+        </div>
+        <label for="review-comments">Comments:</label></br>
+        <textarea id="review-comments" name="comments"></textarea></br>
+        <div id="form-error"></div>
+        <button class="submit-button" onclick="addReview()">Add Review</button>
+      </form>
+    </section>
+
     <!-- Beginning reviews -->
     <section id="reviews-container">
       <ul id="reviews-list"></ul>
     </section>
     <!-- End reviews -->
+
+
   </main>
   <!-- End main -->
 

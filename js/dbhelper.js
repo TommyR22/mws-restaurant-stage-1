@@ -8,7 +8,7 @@ class DBHelper {
      * Change this to restaurants.json file location on your server.
      */
     static get DATABASE_URL() {
-        const port = 1337 // Change this to your server port
+        const port = 1337; // Change this to your server port
         return `http://localhost:${port}/restaurants`;
     }
 
@@ -26,6 +26,7 @@ class DBHelper {
             var db = open.result;
             var store = db.createObjectStore("RestaurantStore", { keyPath: "id" });
             var index = store.createIndex("by-id", "id");
+
         };
 
         open.onerror = function(err) {
@@ -243,5 +244,155 @@ class DBHelper {
         );
         return marker;
     }
+
+    static addReview(review) {
+        let api = {
+            name: 'addReview',
+            data: review,
+            object_type: 'review'
+        };
+
+        // Check if online
+        if(!navigator.onLine && (api.name === 'addReview')) {
+            sendDataWhenOnline(api);
+            return;
+        }
+
+        var api_url = `http://localhost:1337/reviews`;
+
+        let reviewSend = {
+            "name": review.name,
+            "rating": parseInt(review.rating),
+            "comments": review.comments,
+            "restaurant_id": parseInt(review.restaurant_id)
+        };
+
+        var fetch_options = {
+            method: 'POST',
+            body: JSON.stringify(reviewSend),
+            headers: new Headers({
+                'Content-Type': 'application/json'
+            })
+        };
+
+        fetch(api_url,fetch_options).then( (response) => {
+        const contentType = response.headers.get('content-type');
+        if(contentType && contentType.indexOf('application/json') !== -1 ) {
+            return response.json();
+        } else {
+            return 'API call successfull';
+        }
+    }).then( (data) => {
+            console.log(`API: Fetch successful!`);
+        callback(null, data);
+    }).catch( error => callback(error, null));
+
+
+    }
+
+
+
+    static sendDataWhenOnline(api) {
+        console.log(api);
+        localStorage.setItem('data', JSON.stringify(api.data));
+        console.log(`Local Storage: ${api.object_type} stored`);
+        window.addEventListener('online', (event) => {
+            let data = JSON.parse(localStorage.getItem('data'));
+
+        if(data !== null) {
+            console.log(data);
+            if (api.api.name === 'addReview') {
+                addReview(api.data, (error, data) => {
+                    error ? console.log(error) : console.log(data);
+                });
+            }
+
+            console.log('LocalState: data sent to api');
+
+            localStorage.removeItem('data');
+            console.log(`Local Storage: ${api.object_type} removed`);
+        }
+        console.log('Browser: Online again!');
+    });
+    }
+
+
+    static addRemoveFavourite( add, restaurant){
+        console.log(restaurant);
+
+        // Get the compatible IndexedDB version
+        var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
+        var open = indexedDB.open("RestaurantDB", 1);
+
+        open.onsuccess = function() {
+            // Start a new transaction
+            var db = open.result;
+            var tx = db.transaction("RestaurantStore", "readwrite");
+            var store = tx.objectStore("RestaurantStore");
+            var index = store.index("by-id");
+
+            // Add the restaurant data
+            restaurant.is_favorite = add;
+            store.put(restaurant);
+
+            var api_url = `http://localhost:1337/restaurants/${restaurant.id}/?is_favorite=${add}`;
+
+            var fetch_options = {
+                method: 'PUT'
+            };
+
+            fetch(api_url,fetch_options).then( (response) => {
+                const contentType = response.headers.get('content-type');
+            if(contentType && contentType.indexOf('application/json') !== -1 ) {
+                return response.json();
+            } else {
+                return 'API call successfull';
+            }
+            }).then( (data) => {
+                console.log(`API: Fetch successful!`);
+            }).catch( error =>  console.log(`Error!`, error));
+
+
+            // Close the db when the transaction is done
+            tx.oncomplete = function() {
+                db.close();
+            };
+        }
+    }
+
+
+    /**
+     * Fetch reviews
+     */
+    static fetchReviewsById(callback) {
+
+        let xhr = new XMLHttpRequest();
+        xhr.open('GET', DBHelper.DATABASE_URL);
+
+        xhr.onload = () => {
+            if (xhr.status === 200) { // Got a success response from server!
+                const restaurants = JSON.parse(xhr.responseText);
+
+                DBHelper.createLocalIDBStore(restaurants); // Cache restaurants in IDB
+
+                callback(null, restaurants);
+            } else { // Oops!. Got an error from server.
+                const error = (`Request failed. Returned status of ${xhr.status}`);
+                callback(error, null);
+            }
+        };
+
+        xhr.onerror = () => {
+            DBHelper.getCachedData((error, restaurants) => {
+                if (restaurants.length > 0) {
+                console.log('Unable to fetch data from server. Using cache data instead', restaurants);
+
+                callback(null, restaurants);
+            }
+        });
+        }
+        xhr.send();
+    }
+
 
 }

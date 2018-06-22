@@ -9,7 +9,7 @@ var markers = []
  */
 document.addEventListener('DOMContentLoaded', (event) => {
 
-  registerServiceWorker();
+  //registerServiceWorker();
   fetchNeighborhoods();
   fetchCuisines();
 });
@@ -205,7 +205,37 @@ createRestaurantHTML = (restaurant) => {
   const more = document.createElement('a');
   more.innerHTML = 'View Details';
   more.href = DBHelper.urlForRestaurant(restaurant);
-  li.append(more)
+  li.append(more);
+
+  const favourite = document.createElement('button');
+  favourite.innerHTML = '★';
+  favourite.style.cssFloat = 'right';
+  favourite.style.backgroundColor = '#AD6500';
+  favourite.style.border = '0';
+    favourite.onclick = function() {
+        if(this.classList.contains('favorite_yes')) {
+            console.log('toggle no');
+            this.classList.remove('favorite_yes');
+            this.classList.add('favorite_no');
+            DBHelper.addRemoveFavourite(false, restaurant);
+        } else {
+            console.log('toggle yes');
+            this.classList.remove('favorite_no');
+            this.classList.add('favorite_yes');
+            DBHelper.addRemoveFavourite(true, restaurant);
+        }
+    };
+
+
+    if (restaurant.is_favorite === 'true') {
+        favourite.classList.remove('favorite_no');
+        favourite.classList.add('favorite_yes');
+    }else {
+        favourite.classList.add('favorite_no');
+    }
+
+
+  li.append(favourite);
 
   return li
 }
