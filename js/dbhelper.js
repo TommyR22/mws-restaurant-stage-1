@@ -364,33 +364,28 @@ class DBHelper {
     /**
      * Fetch reviews
      */
-    static fetchReviewsById(callback) {
+    static fetchReviewById(id, callback) {
 
         let xhr = new XMLHttpRequest();
-        xhr.open('GET', DBHelper.DATABASE_URL);
+        var url = `http://localhost:1337/reviews/?restaurant_id=${id}`;
+        xhr.open('GET', url);
 
         xhr.onload = () => {
             if (xhr.status === 200) { // Got a success response from server!
-                const restaurants = JSON.parse(xhr.responseText);
-
-                DBHelper.createLocalIDBStore(restaurants); // Cache restaurants in IDB
-
-                callback(null, restaurants);
+                const reviews = JSON.parse(xhr.responseText);
+                callback(null, reviews);
             } else { // Oops!. Got an error from server.
                 const error = (`Request failed. Returned status of ${xhr.status}`);
-                callback(error, null);
             }
         };
 
         xhr.onerror = () => {
-            DBHelper.getCachedData((error, restaurants) => {
-                if (restaurants.length > 0) {
-                console.log('Unable to fetch data from server. Using cache data instead', restaurants);
-
-                callback(null, restaurants);
-            }
-        });
-        }
+            // DBHelper.getCachedData((error, restaurants) => {
+            //     if (restaurants.length > 0) {
+            //     console.log('Unable to fetch data from server. Using cache data instead', restaurants);
+            //
+            // }
+        };
         xhr.send();
     }
 

@@ -72,7 +72,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 
     DBHelper.fetchReviewById(restaurant.id, (error, reviews) => {
         self.reviews = reviews;
-
+        fillReviewsHTML(reviews);
     });
 
 }
@@ -101,6 +101,7 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
  * Create all reviews HTML and add them to the webpage.
  */
 fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+  console.log('Reviews:', reviews);
   const container = document.getElementById('reviews-container');
   const title = document.createElement('h2');
   title.innerHTML = 'Reviews';
@@ -130,7 +131,7 @@ createReviewHTML = (review) => {
   li.appendChild(name);
 
   const date = document.createElement('p');
-  date.innerHTML = review.date;
+  date.innerHTML = new Date(review.createdAt).toLocaleString();
   li.appendChild(date);
 
   const rating = document.createElement('p');
@@ -168,7 +169,7 @@ addReview = () => {
         rating: parseInt(review[1]),
         name: review[0],
         comments: review[2],
-        date: new Date()
+        createdAt: new Date()
     };
 
     addReviewHTML(frontEndReview);
