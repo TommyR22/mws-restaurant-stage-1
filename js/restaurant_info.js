@@ -56,7 +56,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   address.innerHTML = restaurant.address;
 
   const image = document.getElementById('restaurant-img');
-  image.className = 'restaurant-img'
+  image.className = 'restaurant-img';
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
   image.alt = 'image of '+ restaurant.name + ' restaurant';
 
@@ -160,8 +160,6 @@ addReview = () => {
 
     const review = [name, rating, comments, restaurantId];
 
-    // Send review to backend
-    DBHelper.addReview(review);
 
     // Add data to DOM
     const frontEndReview = {
@@ -171,6 +169,8 @@ addReview = () => {
         comments: review[2],
         createdAt: new Date()
     };
+    // Send review to backend
+    DBHelper.addReview(frontEndReview);
 
     addReviewHTML(frontEndReview);
 
@@ -181,7 +181,9 @@ addReview = () => {
 addReviewHTML = (review) => {
     //const ListContainer = document.getElementById('reviews-list');
     //ListContainer.prepend(createReviewHTML(review));
-    document.getElementById('no-review').remove();
+    if (document.getElementById('no-review')) {
+        document.getElementById('no-review').remove();
+    }
 
     const container = document.getElementById('reviews-container');
     const ul = document.getElementById('reviews-list');

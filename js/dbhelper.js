@@ -254,7 +254,7 @@ class DBHelper {
 
         // Check if online
         if(!navigator.onLine && (api.name === 'addReview')) {
-            sendDataWhenOnline(api);
+            DBHelper.sendDataWhenOnline(api);
             return;
         }
 
@@ -266,6 +266,7 @@ class DBHelper {
             "comments": review.comments,
             "restaurant_id": parseInt(review.restaurant_id)
         };
+        console.log('Sending review: ', reviewSend);
 
         var fetch_options = {
             method: 'POST',
@@ -276,44 +277,41 @@ class DBHelper {
         };
 
         fetch(api_url,fetch_options).then( (response) => {
-        const contentType = response.headers.get('content-type');
-        if(contentType && contentType.indexOf('application/json') !== -1 ) {
-            return response.json();
-        } else {
-            return 'API call successfull';
-        }
-    }).then( (data) => {
-            console.log(`API: Fetch successful!`);
-        callback(null, data);
-    }).catch( error => callback(error, null));
-
+            const contentType = response.headers.get('content-type');
+            if(contentType && contentType.indexOf('application/json') !== -1 ) {
+                return response.json();
+            } else {
+                return 'API call successfull';
+            }
+        }).then( (data) => {
+                console.log(`API: AddReview Fetch successful!`);
+            //callback(null, data);
+        }).catch( error => console.log('error:', error));
 
     }
 
 
 
     static sendDataWhenOnline(api) {
-        console.log(api);
+        console.log('API', api);
         localStorage.setItem('data', JSON.stringify(api.data));
         console.log(`Local Storage: ${api.object_type} stored`);
         window.addEventListener('online', (event) => {
+            console.log('Browser: Online again!');
             let data = JSON.parse(localStorage.getItem('data'));
 
-        if(data !== null) {
-            console.log(data);
-            if (api.api.name === 'addReview') {
-                addReview(api.data, (error, data) => {
-                    error ? console.log(error) : console.log(data);
-                });
+            if(data !== null) {
+                console.log(data);
+                if (api.name === 'addReview') {
+                    DBHelper.addReview(api.data);
+                }
+
+                console.log('LocalState: data sent to api');
+
+                localStorage.removeItem('data');
+                console.log(`Local Storage: ${api.object_type} removed`);
             }
-
-            console.log('LocalState: data sent to api');
-
-            localStorage.removeItem('data');
-            console.log(`Local Storage: ${api.object_type} removed`);
-        }
-        console.log('Browser: Online again!');
-    });
+        });
     }
 
 
